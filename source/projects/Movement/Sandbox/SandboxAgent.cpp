@@ -10,6 +10,32 @@ SandboxAgent::SandboxAgent(): BaseAgent()
 
 void SandboxAgent::Update(float dt)
 {
+	const float maxSpeed{ 50.0f };
+	const float arrivalRadius{ 1.0f };
+	const float slowRadius{ 15.0f };
+
+	const Vector2 toTarget{ m_Target - GetPosition() };
+	const float distance{ toTarget.Magnitude() };
+
+	if (distance < arrivalRadius)
+	{
+		SetLinearVelocity({ 0.0f, 0.0f });
+		return;
+	}
+
+	Vector2 velocity = toTarget.GetNormalized();
+
+	if (distance <  slowRadius)
+	{
+		velocity *= maxSpeed * distance / slowRadius;
+	}
+	else
+	{
+		velocity *= maxSpeed;
+	}
+
+	SetLinearVelocity(velocity);
+
 	//Orientation
 	AutoOrient();
 }

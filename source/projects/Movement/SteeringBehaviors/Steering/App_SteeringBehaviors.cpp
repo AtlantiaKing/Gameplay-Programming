@@ -311,12 +311,30 @@ void App_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& a)
 {
 	SAFE_DELETE(a.pBehavior);
 	bool useMouseAsTarget = a.SelectedTarget < 0;
-	bool autoOrient = true;
+	bool autoOrient = BehaviorTypes(a.SelectedBehavior) != BehaviorTypes::Face;
 
 	switch (BehaviorTypes(a.SelectedBehavior))
 	{
 	case BehaviorTypes::Seek:
 		a.pBehavior = new Seek();
+		break;
+	case BehaviorTypes::Flee:
+		a.pBehavior = new Flee();
+		break;
+	case BehaviorTypes::Arrive:
+		a.pBehavior = new Arrive();
+		break;
+	case BehaviorTypes::Face:
+		a.pBehavior = new Face();
+		break;
+	case BehaviorTypes::Wander:
+		a.pBehavior = new Wander();
+		break;
+	case BehaviorTypes::Pursuit:
+		a.pBehavior = new Pursuit();
+		break;
+	case BehaviorTypes::Evade:
+		a.pBehavior = new Evade();
 		break;
 	}
 
