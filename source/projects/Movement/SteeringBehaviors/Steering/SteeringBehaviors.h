@@ -58,7 +58,7 @@ public:
 	Flee() = default;
 	virtual ~Flee() = default;
 
-	//Seek Behaviour
+	//Flee Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
 private:
 };
@@ -72,7 +72,7 @@ public:
 	Arrive() = default;
 	virtual ~Arrive() = default;
 
-	//Seek Behaviour
+	//Arrive Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
 private:
 };
@@ -86,7 +86,7 @@ public:
 	Face() = default;
 	virtual ~Face() = default;
 
-	//Seek Behaviour
+	//Face Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
 private:
 };
@@ -100,7 +100,7 @@ public:
 	Wander() = default;
 	virtual ~Wander() = default;
 
-	//Seek Behaviour
+	//Wander Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
 
 	void SetWanderOffset(float offset) { m_OffsetDistance = offset; };
@@ -122,7 +122,7 @@ public:
 	Pursuit() = default;
 	virtual ~Pursuit() = default;
 
-	//Seek Behaviour
+	//Pursuit Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
 private:
 };
@@ -136,9 +136,11 @@ public:
 	Evade() = default;
 	virtual ~Evade() = default;
 
-	//Seek Behaviour
+	//Evade Behaviour
 	SteeringOutput CalculateSteering(float deltaT, SteeringAgent* pAgent) override;
+	void SetFleeRadius(float fleeRadius) { m_FleeRadius = fleeRadius; };
 private:
+	float m_FleeRadius = 15.0f;
 };
 #endif
 

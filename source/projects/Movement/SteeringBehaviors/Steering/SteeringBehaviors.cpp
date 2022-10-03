@@ -20,7 +20,7 @@ SteeringOutput Seek::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 
 	if (pAgent->CanRenderBehavior())
 	{
-		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, steering.LinearVelocity.Magnitude(), {0.0f, 1.0f, 0.0f});
+		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, 5.0f, {0.0f, 1.0f, 0.0f});
 	}
 
 	return steering;
@@ -30,10 +30,10 @@ SteeringOutput Seek::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 //****
 SteeringOutput Flee::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
+	Vector2 fromTarget = pAgent->GetPosition() - m_Target.Position;
 	SteeringOutput steering = {};
 
-	steering.LinearVelocity = pAgent->GetPosition() - m_Target.Position;
-	steering.LinearVelocity.Normalize();
+	steering.LinearVelocity = fromTarget.GetNormalized();
 	steering.LinearVelocity *= pAgent->GetMaxLinearSpeed();
 
 	if (pAgent->CanRenderBehavior())
@@ -76,7 +76,7 @@ SteeringOutput Arrive::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 	{
 		DEBUGRENDERER2D->DrawCircle(m_Target.Position, slowRadius, { 0.0f, 0.0f, 1.0f }, 0.0f);
 		DEBUGRENDERER2D->DrawCircle(m_Target.Position, stopRadius, { 1.0f, 0.0f, 0.0f }, 0.0f);
-		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, steering.LinearVelocity.Magnitude(), {0.0f, 1.0f, 0.0f});
+		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, 5.0f, {0.0f, 1.0f, 0.0f});
 	}
 
 	return steering;
@@ -179,12 +179,26 @@ SteeringOutput Pursuit::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 //****
 SteeringOutput Evade::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
+	Vector2 fromTarget = m_Target.Position - pAgent->GetPosition();
+	float distance = fromTarget.Normalize();
+
+	if (distance > m_FleeRadius)
+	{
+		SteeringOutput steering{};
+		steering.IsValid = false;
+		return steering;
+	}
+
+	const float maxDistance = 10.0f;
+	if (distance > maxDistance)
+	{
+		distance = maxDistance;
+	}
+
 	Vector2 targetVel{ m_Target.LinearVelocity };
 	const float targetVelMagnitude{ targetVel.Normalize() };
 
-	const float curDistanceSqr{ pAgent->GetPosition().DistanceSquared(m_Target.Position) };
-
-	Vector2 targetOffset{ targetVel * (targetVelMagnitude + pAgent->GetLinearVelocity().Magnitude()) };
+	Vector2 targetOffset{ targetVel * targetVelMagnitude * (distance * distance) / (maxDistance * maxDistance )};
 	m_Target = m_Target.Position + targetOffset;
 
 	SteeringOutput steering{ Flee::CalculateSteering(deltaT, pAgent) };
@@ -193,6 +207,6 @@ SteeringOutput Evade::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 	{
 		DEBUGRENDERER2D->DrawCircle(m_Target.Position, 1.0f, { 0.0f, 0.0f, 1.0f }, 0.0f);
 	}
-	;
+
 	return steering;
 }
