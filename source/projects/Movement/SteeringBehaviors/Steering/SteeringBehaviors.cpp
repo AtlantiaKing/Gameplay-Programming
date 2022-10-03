@@ -189,17 +189,22 @@ SteeringOutput Evade::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 		return steering;
 	}
 
-	const float maxDistance = 10.0f;
-	if (distance > maxDistance)
+	if (distance > m_FleeRadius / 5.0f)
 	{
-		distance = maxDistance;
+		const float maxDistance = m_FleeRadius / 2.0f;
+		if (distance > maxDistance)
+		{
+			distance = maxDistance;
+		}
+
+		Vector2 targetVel{ m_Target.LinearVelocity };
+		targetVel.Normalize();
+
+		const float lookInFutureDistance{ 10.0f };
+
+		Vector2 targetOffset{ targetVel * lookInFutureDistance * distance / maxDistance };
+		m_Target = m_Target.Position + targetOffset;
 	}
-
-	Vector2 targetVel{ m_Target.LinearVelocity };
-	const float targetVelMagnitude{ targetVel.Normalize() };
-
-	Vector2 targetOffset{ targetVel * targetVelMagnitude * (distance * distance) / (maxDistance * maxDistance )};
-	m_Target = m_Target.Position + targetOffset;
 
 	SteeringOutput steering{ Flee::CalculateSteering(deltaT, pAgent) };
 

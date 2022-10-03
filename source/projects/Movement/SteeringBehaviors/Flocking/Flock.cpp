@@ -29,6 +29,7 @@ Flock::Flock(
 	m_pWanderBehavior = new Wander{};
 	m_pWanderBehavior->SetMaxAngleChange(0.01f);
 	m_pEvadeBehavior = new Evade{};
+	m_pEvadeBehavior->SetFleeRadius(20.0f);
 
 	// The weight of each behavior in the blended behavior (there are 5 behaviors in our example)
 	const float weightBehaviour{ 1.0f / 5.0f };
@@ -56,6 +57,8 @@ Flock::Flock(
 		pNewAgent->SetSteeringBehavior(m_pPrioritySteering);
 		pNewAgent->SetAutoOrient(true);
 		pNewAgent->SetPosition({ rand() % 1001 / 1000.0f * m_WorldSize, rand() % 1001 / 1000.0f * m_WorldSize });
+		pNewAgent->SetMaxLinearSpeed(35.0f);
+		pNewAgent->SetMass(1.0f);
 
 		m_pAgents[i] = pNewAgent;
 	}
@@ -88,17 +91,17 @@ void Flock::Update(float deltaT)
 {
 	m_pAgentToEvade->Update(deltaT);
 
+	if (m_TrimWorld)
+	{
+		m_pAgentToEvade->TrimToWorld(m_WorldSize);
+	}
+
 	auto target = TargetData{};
 	target.Position = m_pAgentToEvade->GetPosition();
 	target.Orientation = m_pAgentToEvade->GetRotation();
 	target.LinearVelocity = m_pAgentToEvade->GetLinearVelocity();
 	target.AngularVelocity = m_pAgentToEvade->GetAngularVelocity();
 	m_pEvadeBehavior->SetTarget(target);
-
-	if (m_TrimWorld)
-	{
-		m_pAgentToEvade->TrimToWorld(m_WorldSize);
-	}
 
 	for (SteeringAgent* pAgent : m_pAgents)
 	{
@@ -281,8 +284,10 @@ void Flock::RegisterNeighbors(SteeringAgent* pAgent)
 
 Elite::Vector2 Flock::GetAverageNeighborPos() const
 {
+	// If there are no neighbors, return an empty position
 	if (m_NrOfNeighbors == 0) return Vector2{};
-
+	
+	// Calculate the average of all the neighor position
 	Vector2 averageNeighborPos{};
 	for (int i{}; i < m_NrOfNeighbors; ++i)
 	{

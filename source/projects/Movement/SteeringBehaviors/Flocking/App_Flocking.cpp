@@ -24,8 +24,9 @@ void App_Flocking::Start()
 	m_pAgentToEvade = new SteeringAgent{};
 	m_pAgentToEvade->SetSteeringBehavior(new Wander{});
 	m_pAgentToEvade->SetRenderBehavior(true);
-	m_pAgentToEvade->SetMaxLinearSpeed(5.0f);
+	m_pAgentToEvade->SetMaxLinearSpeed(30.0f);
 	m_pAgentToEvade->SetAutoOrient(true);
+	m_pAgentToEvade->SetBodyColor({ 1.0f, 0.0f, 0.0f });
 
 	m_pFlock = new Flock(m_FlockSize, m_TrimWorldSize, m_pAgentToEvade, true);
 }
