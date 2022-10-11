@@ -43,10 +43,13 @@ public:
 	void SetRenderBehavior(bool isEnabled) { m_RenderBehavior = isEnabled; }
 	bool CanRenderBehavior() const { return m_RenderBehavior; }
 
+	Elite::Vector2 GetPreviousPosition() const { return m_PrevPosition; };
+
 protected:
 	//--- Datamembers ---
 	ISteeringBehavior* m_pSteeringBehavior = nullptr;
 
+	Elite::Vector2 m_PrevPosition = {};
 	float m_MaxLinearSpeed = 10.f;
 	float m_MaxAngularSpeed = 10.f;
 	bool m_AutoOrient = false;

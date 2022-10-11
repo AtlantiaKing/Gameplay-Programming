@@ -34,6 +34,8 @@ void SteeringAgent::Update(float dt)
 				output.AngularVelocity = m_MaxAngularSpeed;
 			SetAngularVelocity(output.AngularVelocity);
 		}
+
+		m_PrevPosition = GetPosition();
 	}
 }
 

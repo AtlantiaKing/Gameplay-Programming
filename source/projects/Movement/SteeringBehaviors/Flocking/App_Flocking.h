@@ -30,10 +30,13 @@ private:
 	bool m_UseMouseTarget = true;
 	bool m_VisualizeMouseTarget = true;
 	
-	float m_TrimWorldSize = 100.f;
-	int m_FlockSize = 5;
+	float m_TrimWorldSize = 100;
+	int m_FlockSize = 1000;
+
+	float m_NrPartitions = 50;
 
 	Flock* m_pFlock = nullptr;
+
 	SteeringAgent* m_pAgentToEvade = nullptr;
 
 	//C++ make the class non-copyable

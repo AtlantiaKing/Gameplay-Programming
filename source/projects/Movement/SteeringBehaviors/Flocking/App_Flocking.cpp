@@ -40,6 +40,9 @@ void App_Flocking::Update(float deltaTime)
 		m_MouseTarget.Position = DEBUGRENDERER2D->GetActiveCamera()->ConvertScreenToWorld({ static_cast<float>(mouseData.X), static_cast<float>(mouseData.Y) });
 	}
 
+	m_pAgentToEvade->Update(deltaTime);
+	m_pAgentToEvade->TrimToWorld(m_TrimWorldSize);
+
 	m_pFlock->UpdateAndRenderUI();
 	m_pFlock->Update(deltaTime);
 	if (m_UseMouseTarget)

@@ -6,6 +6,7 @@ class ISteeringBehavior;
 class SteeringAgent;
 class BlendedSteering;
 class PrioritySteering;
+class CellSpace;
 
 class Flock final
 {
@@ -46,8 +47,13 @@ private:
 	bool m_TrimWorld = false;
 	float m_WorldSize = 0.f;
 
-	float m_NeighborhoodRadius = 10.f;
+	float m_NeighborhoodRadius = 5.0f;
 	int m_NrOfNeighbors = 0;
+
+	const int m_NrPartitionsInAxis = 25;
+	CellSpace* m_pCellSpace = nullptr;
+	bool m_IsUsingPartitioning = true;
+	bool m_DrawPartitioning = true;
 
 	SteeringAgent* m_pAgentToEvade = nullptr;
 	

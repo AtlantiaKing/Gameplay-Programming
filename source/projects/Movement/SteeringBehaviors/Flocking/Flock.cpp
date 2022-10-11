@@ -4,6 +4,7 @@
 #include "../SteeringAgent.h"
 #include "../Steering/SteeringBehaviors.h"
 #include "../CombinedSteering/CombinedSteeringBehaviors.h"
+#include "../SpacePartitioning/SpacePartitioning.h"
 
 using namespace Elite;
 
@@ -36,11 +37,11 @@ Flock::Flock(
 
 	// Create the blended behavior
 	m_pBlendedSteering = new BlendedSteering{ { 
-		{ m_pSeekBehavior, weightBehaviour }, 
+		{ m_pSeekBehavior, weightBehaviour },
 		{ m_pSeparationBehavior, weightBehaviour },
 		{ m_pCohesionBehavior, weightBehaviour },
 		{ m_pVelMatchBehavior, weightBehaviour },
-		{ m_pWanderBehavior, weightBehaviour } 
+		{ m_pWanderBehavior, weightBehaviour }
 			} };
 
 	// Create the priority behavior
@@ -49,18 +50,28 @@ Flock::Flock(
 	// Resize the agent container to the amount of agents
 	m_pAgents.resize(m_FlockSize);
 
+	m_pCellSpace = new CellSpace(m_WorldSize, m_WorldSize, m_NrPartitionsInAxis, m_NrPartitionsInAxis);
+
 	// Initialize each agent in the flock
 	for (int i = 0; i < m_FlockSize; ++i)
 	{
 		SteeringAgent* pNewAgent{ new SteeringAgent{} };
 
 		pNewAgent->SetSteeringBehavior(m_pPrioritySteering);
+
 		pNewAgent->SetAutoOrient(true);
 		pNewAgent->SetPosition({ rand() % 1001 / 1000.0f * m_WorldSize, rand() % 1001 / 1000.0f * m_WorldSize });
-		pNewAgent->SetMaxLinearSpeed(35.0f);
+		pNewAgent->SetMaxLinearSpeed(50.0f);
 		pNewAgent->SetMass(1.0f);
 
 		m_pAgents[i] = pNewAgent;
+
+		if (i == m_FlockSize - 1)
+		{
+			int i = 0;
+		}
+
+		m_pCellSpace->AddAgent(pNewAgent);
 	}
 
 	// Resize the neighbor container to the amount of agents except one (the current agent is never included)
@@ -79,6 +90,8 @@ Flock::~Flock()
 	SAFE_DELETE(m_pBlendedSteering);
 	SAFE_DELETE(m_pPrioritySteering);
 
+	SAFE_DELETE(m_pCellSpace);
+
 	for(auto pAgent: m_pAgents)
 	{
 		SAFE_DELETE(pAgent);
@@ -89,13 +102,6 @@ Flock::~Flock()
 
 void Flock::Update(float deltaT)
 {
-	m_pAgentToEvade->Update(deltaT);
-
-	if (m_TrimWorld)
-	{
-		m_pAgentToEvade->TrimToWorld(m_WorldSize);
-	}
-
 	auto target = TargetData{};
 	target.Position = m_pAgentToEvade->GetPosition();
 	target.Orientation = m_pAgentToEvade->GetRotation();
@@ -105,14 +111,24 @@ void Flock::Update(float deltaT)
 
 	for (SteeringAgent* pAgent : m_pAgents)
 	{
-		RegisterNeighbors(pAgent);
-
-		pAgent->Update(deltaT);
+		const Vector2 prevPosition{ pAgent->GetPreviousPosition() };
 
 		if (m_TrimWorld)
 		{
 			pAgent->TrimToWorld(m_WorldSize);
 		}
+
+		if (m_IsUsingPartitioning)
+		{
+			m_pCellSpace->UpdateAgentCell(pAgent, prevPosition);
+			m_NrOfNeighbors = m_pCellSpace->RegisterNeighbors(m_pNeighbors, pAgent, m_NeighborhoodRadius);
+		}
+		else
+		{
+			RegisterNeighbors(pAgent);
+		}
+
+		pAgent->Update(deltaT);
 	}
 
 	int test = 0;
@@ -129,6 +145,11 @@ void Flock::Render(float deltaT)
 		{
 			DEBUGRENDERER2D->DrawCircle(pAgent->GetPosition(), m_NeighborhoodRadius, { 0.0f, 1.0f, 0.0f }, 0.0f);
 		}
+	}
+
+	if (m_IsUsingPartitioning && m_DrawPartitioning)
+	{
+		m_pCellSpace->RenderCells();
 	}
 }
 
@@ -170,9 +191,13 @@ void Flock::UpdateAndRenderUI()
 	ImGui::Text("Flocking");
 	ImGui::Spacing();
 
+	ImGui::Checkbox("Use Space Partitioning", &m_IsUsingPartitioning);
+
 	// Display debug logic
 	if (ImGui::CollapsingHeader("Debug Info"))
 	{
+		ImGui::Checkbox("Draw Space Partitioning", &m_DrawPartitioning);
+
 		bool isCheckedWander = m_pAgentToEvade->CanRenderBehavior();
 		ImGui::Checkbox("Render Wandering Agent Debug", &isCheckedWander);
 		m_pAgentToEvade->SetRenderBehavior(isCheckedWander);
@@ -193,7 +218,7 @@ void Flock::UpdateAndRenderUI()
 	if (ImGui::CollapsingHeader("Flock Properties"))
 	{
 		auto v = m_pAgents[0]->GetMaxLinearSpeed();
-		if (ImGui::SliderFloat("Lin", &v, 0.f, 35.f, "%.2f"))
+		if (ImGui::SliderFloat("Lin", &v, 0.f, 50.0f, "%.2f"))
 		{
 			for (SteeringAgent* pAgent : m_pAgents)
 			{
