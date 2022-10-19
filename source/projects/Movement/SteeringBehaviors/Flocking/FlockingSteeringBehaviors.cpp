@@ -10,17 +10,11 @@ using namespace Elite;
 //COHESION (FLOCKING)
 SteeringOutput Cohesion::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
-	// If there are agents, set the target to the average position of the neighbors, otherwise set the target to its own position
-	if (m_pFlock->GetNrOfNeighbors() > 0)
-	{
-		m_Target = m_pFlock->GetAverageNeighborPos();
-	}
-	else
-	{
-		m_Target = pAgent->GetPosition();
-	}
+	// If there are no agents, do nothing
+	if (m_pFlock->GetNrOfNeighbors() <= 0) return {};
 
-	// Return the result of the seek steering
+	// If there are agents, set the target to the average position of the neighbors
+	m_Target = m_pFlock->GetAverageNeighborPos();
 	return Seek::CalculateSteering(deltaT, pAgent);
 }
 
@@ -28,6 +22,9 @@ SteeringOutput Cohesion::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 //SEPARATION (FLOCKING)
 SteeringOutput Separation::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
+	// If there are no agents, do nothing
+	if (m_pFlock->GetNrOfNeighbors() <= 0) return {};
+
 	// Get all data about the neighbors
 	const std::vector<SteeringAgent*>& pNeightbors = m_pFlock->GetNeighbors();
 	const int nrNeighbors{ m_pFlock->GetNrOfNeighbors() };
@@ -58,16 +55,13 @@ SteeringOutput Separation::CalculateSteering(float deltaT, SteeringAgent* pAgent
 //VELOCITY MATCH (FLOCKING)
 SteeringOutput VelocityMatch::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
+	// If there are no agents, do nothing
+	if (m_pFlock->GetNrOfNeighbors() <= 0) return {};
+
 	SteeringOutput steering{};
 
-	if (m_pFlock->GetNrOfNeighbors() > 0)
-	{
-		steering.LinearVelocity = m_pFlock->GetAverageNeighborVelocity();
-	}
-	else
-	{
-		steering.LinearVelocity = pAgent->GetLinearVelocity();
-	}
+	// Set the velocity to the average velocity of all the neighbours
+	steering.LinearVelocity = m_pFlock->GetAverageNeighborVelocity();
 
 	return steering;
 }

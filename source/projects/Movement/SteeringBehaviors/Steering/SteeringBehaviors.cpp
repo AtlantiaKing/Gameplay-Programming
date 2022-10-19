@@ -179,9 +179,11 @@ SteeringOutput Pursuit::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 //****
 SteeringOutput Evade::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
+	// Calculate the distance between the agent and the target
 	Vector2 fromTarget = m_Target.Position - pAgent->GetPosition();
 	float distance = fromTarget.Normalize();
 
+	// If the target is far enough, don't execute Evade
 	if (distance > m_FleeRadius)
 	{
 		SteeringOutput steering{};
@@ -189,25 +191,39 @@ SteeringOutput Evade::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 		return steering;
 	}
 
-	if (distance > m_FleeRadius / 5.0f)
+	// The radius in which the agent should just flee from the target instead of looking in to the future trajectory of the target
+	const float radiusToRunAway{ m_FleeRadius / 5.0f };
+
+	// If the agent is not in this radius, look ahead
+	if (distance > radiusToRunAway)
 	{
+		// If the agent is further away from the target then the maxDistance, the agent should look at the maximum look ahead distance
 		const float maxDistance = m_FleeRadius / 2.0f;
+
+		// Clamp the distance to this max distance
 		if (distance > maxDistance)
 		{
 			distance = maxDistance;
 		}
 
+		// Get the direction the target is currently moving in
 		Vector2 targetVel{ m_Target.LinearVelocity };
 		targetVel.Normalize();
 
+		// The max distance that an agent should look ahead of the target
 		const float lookInFutureDistance{ 10.0f };
 
+		// Calculate the offset from the target
 		Vector2 targetOffset{ targetVel * lookInFutureDistance * distance / maxDistance };
+
+		// Set the target to the previous target + the offset
 		m_Target = m_Target.Position + targetOffset;
 	}
 
+	// Execute the fleeing behaviour with the new target
 	SteeringOutput steering{ Flee::CalculateSteering(deltaT, pAgent) };
 
+	// Draw a dot on the location where the agent if fleeing from
 	if (pAgent->CanRenderBehavior())
 	{
 		DEBUGRENDERER2D->DrawCircle(m_Target.Position, 1.0f, { 0.0f, 0.0f, 1.0f }, 0.0f);

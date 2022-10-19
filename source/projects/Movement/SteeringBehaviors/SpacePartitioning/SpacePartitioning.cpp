@@ -69,33 +69,40 @@ int CellSpace::RegisterNeighbors(std::vector<SteeringAgent*>& pNeigbors, Steerin
 {
 	int nrOfNeighbors{};
 
-	const int centerCell{ PositionToIndex(pAgent->GetPosition()) };
+	// Find the cell that the agent is currently in
 	const Elite::Vector2 curPos{ pAgent->GetPosition() };
+	const int centerCell{ PositionToIndex(curPos) };
 
+	// Calculate the bounding cells that should be checked
 	const int minX{ static_cast<int>((curPos.x - queryRadius) / m_CellWidth) };
 	const int minY{ static_cast<int>((curPos.y - queryRadius) / m_CellWidth) };
 	const int maxX{ static_cast<int>((curPos.x + queryRadius) / m_CellWidth) };
 	const int maxY{ static_cast<int>((curPos.y + queryRadius) / m_CellWidth) };
 
+	// For each cell in the queryRadius
 	for (int y{ minY < 0 ? 0 : minY }; y <= maxY && y < m_NrOfCols; ++y)
 	{
-		if (y < 0) continue;
-
 		for (int x{ minX < 0 ? 0 : minX }; x <= maxX && x < m_NrOfRows; ++x)
 		{
+			// Get data of the current cell
 			const Cell& pCell{ m_Cells[y * m_NrOfRows + x] };
 			const std::list<SteeringAgent*>& agents{ pCell.agents };
 
+			// For each agent in the current cell
 			for (SteeringAgent* pOtherAgent : agents)
 			{
+				// If the current agent is the agent looking for neighbors, don't calculate anything
 				if (pOtherAgent == pAgent) continue;
 
+				// Calculate the distance between the agents
 				const float sqrDistance{ Elite::DistanceSquared(pOtherAgent->GetPosition(), pAgent->GetPosition()) };
 
+				// If the agent is inside the queryRadius, add the agent to the neighbors
 				if (sqrDistance < queryRadius * queryRadius)
 				{
 					pNeigbors[nrOfNeighbors++] = pOtherAgent;
 
+					// Draw a green cirlce above the neighbor to indicite that this agent is a neighbor
 					if (pAgent->CanRenderBehavior())
 						DEBUGRENDERER2D->DrawSolidCircle(
 							pOtherAgent->GetPosition(),
@@ -107,6 +114,7 @@ int CellSpace::RegisterNeighbors(std::vector<SteeringAgent*>& pNeigbors, Steerin
 				}
 			}
 
+			// Draw all neighbouring cells
 			if (pAgent->CanRenderBehavior())
 			{
 				const std::vector<Elite::Vector2> rectPoints{ pCell.GetRectPoints() };
@@ -115,6 +123,8 @@ int CellSpace::RegisterNeighbors(std::vector<SteeringAgent*>& pNeigbors, Steerin
 			}
 		}
 	}
+
+	// Return the amount of neighbors
 	return nrOfNeighbors;
 }
 

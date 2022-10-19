@@ -189,7 +189,10 @@ void Flock::UpdateAndRenderUI()
 	ImGui::Text("Flocking");
 	ImGui::Spacing();
 
-	ImGui::Checkbox("Use Space Partitioning", &m_IsUsingPartitioning);
+	if (ImGui::Checkbox("Use Space Partitioning", &m_IsUsingPartitioning))
+	{
+		if(m_IsUsingPartitioning) m_pCellSpace->EmptyCells();
+	}
 
 	ImGui::Checkbox("Is rendering agents", &m_IsRenderingAgents);
 
@@ -243,6 +246,8 @@ void Flock::UpdateAndRenderUI()
 				pAgent->SetMass(v);
 			}
 		}
+
+		ImGui::SliderFloat("Neighborhood radius", &m_NeighborhoodRadius, 5.0f, 20.0f, "%0.2f");
 	}
 
 	ImGui::Spacing();

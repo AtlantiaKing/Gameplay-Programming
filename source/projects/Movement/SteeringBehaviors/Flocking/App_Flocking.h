@@ -33,10 +33,9 @@ private:
 	float m_TrimWorldSize = 250;
 	int m_FlockSize = 4000;
 
-	float m_NrPartitions = 25;
-
 	Flock* m_pFlock = nullptr;
 
+	Wander* m_pWanderBehavior = nullptr;
 	SteeringAgent* m_pAgentToEvade = nullptr;
 
 	//C++ make the class non-copyable

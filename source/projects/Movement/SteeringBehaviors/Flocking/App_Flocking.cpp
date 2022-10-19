@@ -12,6 +12,7 @@ using namespace Elite;
 App_Flocking::~App_Flocking()
 {	
 	SAFE_DELETE(m_pFlock);
+	SAFE_DELETE(m_pWanderBehavior);
 	SAFE_DELETE(m_pAgentToEvade);
 }
 
@@ -21,8 +22,10 @@ void App_Flocking::Start()
 	DEBUGRENDERER2D->GetActiveCamera()->SetZoom(55.0f);
 	DEBUGRENDERER2D->GetActiveCamera()->SetCenter(Elite::Vector2(m_TrimWorldSize / 1.5f, m_TrimWorldSize / 2));
 
+	m_pWanderBehavior = new Wander{};
+
 	m_pAgentToEvade = new SteeringAgent{};
-	m_pAgentToEvade->SetSteeringBehavior(new Wander{});
+	m_pAgentToEvade->SetSteeringBehavior(m_pWanderBehavior);
 	m_pAgentToEvade->SetRenderBehavior(true);
 	m_pAgentToEvade->SetMaxLinearSpeed(30.0f);
 	m_pAgentToEvade->SetAutoOrient(true);
