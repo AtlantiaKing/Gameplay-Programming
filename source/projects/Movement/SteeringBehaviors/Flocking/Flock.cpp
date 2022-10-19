@@ -19,7 +19,7 @@ Flock::Flock(
 	, m_FlockSize{ flockSize }
 	, m_TrimWorld { trimWorld }
 	, m_pAgentToEvade{pAgentToEvade}
-	, m_NeighborhoodRadius{ 15 }
+	, m_NeighborhoodRadius{ 10.0f }
 	, m_NrOfNeighbors{0}
 {
 	// Create each behavior
@@ -37,11 +37,11 @@ Flock::Flock(
 
 	// Create the blended behavior
 	m_pBlendedSteering = new BlendedSteering{ { 
-		{ m_pSeekBehavior, weightBehaviour },
-		{ m_pSeparationBehavior, weightBehaviour },
-		{ m_pCohesionBehavior, weightBehaviour },
-		{ m_pVelMatchBehavior, weightBehaviour },
-		{ m_pWanderBehavior, weightBehaviour }
+		{ m_pSeekBehavior, 0.2f/*weightBehaviour*/ },
+		{ m_pSeparationBehavior, 0.4f/*weightBehaviour*/ },
+		{ m_pCohesionBehavior, 0.2f/*weightBehaviour*/ },
+		{ m_pVelMatchBehavior, 0.4f/*weightBehaviour*/ },
+		{ m_pWanderBehavior, 0.4f/*weightBehaviour*/ }
 			} };
 
 	// Create the priority behavior
@@ -130,17 +130,15 @@ void Flock::Update(float deltaT)
 
 		pAgent->Update(deltaT);
 	}
-
-	int test = 0;
 }
 
 void Flock::Render(float deltaT)
 {
-	m_pAgentToEvade->Render(deltaT);
+	//m_pAgentToEvade->Render(deltaT);
 
 	for (SteeringAgent* pAgent : m_pAgents)
-	{		
-		pAgent->Render(deltaT);
+	{
+		if (m_IsRenderingAgents) pAgent->Render(deltaT);
 		if (pAgent->CanRenderBehavior())
 		{
 			DEBUGRENDERER2D->DrawCircle(pAgent->GetPosition(), m_NeighborhoodRadius, { 0.0f, 1.0f, 0.0f }, 0.0f);
@@ -192,6 +190,8 @@ void Flock::UpdateAndRenderUI()
 	ImGui::Spacing();
 
 	ImGui::Checkbox("Use Space Partitioning", &m_IsUsingPartitioning);
+
+	ImGui::Checkbox("Is rendering agents", &m_IsRenderingAgents);
 
 	// Display debug logic
 	if (ImGui::CollapsingHeader("Debug Info"))

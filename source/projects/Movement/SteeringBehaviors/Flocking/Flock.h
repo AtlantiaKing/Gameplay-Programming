@@ -40,6 +40,8 @@ private:
 	std::vector<SteeringAgent*> m_pAgents;
 	std::vector<SteeringAgent*> m_pNeighbors;
 
+	bool m_IsRenderingAgents = true;
+
 	bool m_IsDebugingAgent{};
 	int m_AgentToDebug = 0;
 	int m_AgentToChangeData = 0;

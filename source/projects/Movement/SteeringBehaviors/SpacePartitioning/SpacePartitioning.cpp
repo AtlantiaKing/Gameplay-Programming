@@ -83,7 +83,6 @@ int CellSpace::RegisterNeighbors(std::vector<SteeringAgent*>& pNeigbors, Steerin
 
 		for (int x{ minX < 0 ? 0 : minX }; x <= maxX && x < m_NrOfRows; ++x)
 		{
-
 			const Cell& pCell{ m_Cells[y * m_NrOfRows + x] };
 			const std::list<SteeringAgent*>& agents{ pCell.agents };
 
@@ -91,7 +90,7 @@ int CellSpace::RegisterNeighbors(std::vector<SteeringAgent*>& pNeigbors, Steerin
 			{
 				if (pOtherAgent == pAgent) continue;
 
-				const float sqrDistance{ (pOtherAgent->GetPosition() - pAgent->GetPosition()).MagnitudeSquared() };
+				const float sqrDistance{ Elite::DistanceSquared(pOtherAgent->GetPosition(), pAgent->GetPosition()) };
 
 				if (sqrDistance < queryRadius * queryRadius)
 				{
@@ -146,6 +145,8 @@ int CellSpace::PositionToIndex(const Elite::Vector2 pos) const
 
 	if (x >= m_NrOfCols) x = m_NrOfCols - 1;
 	if (y >= m_NrOfRows) y = m_NrOfRows - 1;
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
 
 	return y * m_NrOfRows + x;
 }

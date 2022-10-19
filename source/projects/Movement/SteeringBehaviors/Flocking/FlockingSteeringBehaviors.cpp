@@ -40,11 +40,11 @@ SteeringOutput Separation::CalculateSteering(float deltaT, SteeringAgent* pAgent
 	for (int i{}; i < nrNeighbors; ++i)
 	{
 		// Get the direction (and distance) away from the neighbor
-		const Vector2 neighborDirection{ pAgent->GetPosition() - pNeightbors[i]->GetPosition() };
-		const float neighborDistance{ neighborDirection.Magnitude() };
+		Vector2 neighborDirection{ pAgent->GetPosition() - pNeightbors[i]->GetPosition() };
+		const float neighborDistance{ neighborDirection.Normalize() };
 
 		// Calculate the seperation vector depending on the distance of the neighbor (the furthur away the neighbor, the smaller the vector)
-		seperationDirection += neighborDirection * (1.0f - neighborDistance / neighborhoodRadius);
+		seperationDirection += neighborDirection * neighborhoodRadius * (1.0f - neighborDistance / neighborhoodRadius);
 	}
 
 	// Set the target to the seperation target
