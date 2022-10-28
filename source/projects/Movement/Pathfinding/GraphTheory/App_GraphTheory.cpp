@@ -86,36 +86,33 @@ void App_GraphTheory::Update(float deltaTime)
 	}
 	else 
 	{
-		/*if (eulerianity != Eulerianity::notEulerian)
-		{*/
-			for (GraphNode2D* n : m_pGraph2D->GetAllNodes())
-			{
-				n->SetColorIndex(-1);
-			}
-			for (GraphNode2D* n : m_pGraph2D->GetAllNodes())
-			{
-				auto connections = m_pGraph2D->GetNodeConnections(n);
+		for (GraphNode2D* n : m_pGraph2D->GetAllNodes())
+		{
+			n->SetColorIndex(-1);
+		}
+		for (GraphNode2D* n : m_pGraph2D->GetAllNodes())
+		{
+			auto connections = m_pGraph2D->GetNodeConnections(n);
 
-				for (int colorIdx{}; colorIdx < m_MaxNrOfColors; ++colorIdx)
+			for (int colorIdx{}; colorIdx < m_MaxNrOfColors; ++colorIdx)
+			{
+				bool invalidColor{};
+				for (GraphConnection2D* c : connections)
 				{
-					bool invalidColor{};
-					for (GraphConnection2D* c : connections)
+					if (m_pGraph2D->GetNode(c->GetTo())->GetColorIndex() == colorIdx)
 					{
-						if (m_pGraph2D->GetNode(c->GetTo())->GetColorIndex() == colorIdx)
-						{
-							invalidColor = true;
-							break;
-						}
-					}
-					if (!invalidColor)
-					{
-						n->SetColorIndex(colorIdx);
-						n->SetColor(m_Colors[colorIdx]);
+						invalidColor = true;
 						break;
 					}
 				}
+				if (!invalidColor)
+				{
+					n->SetColorIndex(colorIdx);
+					n->SetColor(m_Colors[colorIdx]);
+					break;
+				}
 			}
-		//}
+		}
 	}
 
 	//------- UI --------
