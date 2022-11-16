@@ -1,4 +1,5 @@
 #pragma once
+#include <framework/EliteAI/EliteNavigation/ENavigation.h>
 
 namespace Elite
 {
@@ -83,7 +84,7 @@ namespace Elite
 					if (existingRecord.pNode == pCurNode)
 					{
 						// Check if the already existing connection is cheaper
-						if (existingRecord.costSoFar < curGCost)
+						if (existingRecord.costSoFar <= curGCost)
 						{
 							// If so, continue to the next connection
 							cheaperConnectionFound = true;
@@ -105,13 +106,13 @@ namespace Elite
 					if (upcomingRecord.pNode == pCurNode)
 					{
 						// Check if the already existing connection is cheaper
-						if (upcomingRecord.costSoFar < curGCost)
+						if (upcomingRecord.costSoFar <= curGCost)
 						{
 							// If so, continue to the next connection
 							cheaperConnectionFound = true;
 							break;
 						}
-
+				
 						// Else remove it from the openList
 						openList.erase(std::remove(openList.begin(), openList.end(), upcomingRecord));
 						break;
@@ -129,40 +130,6 @@ namespace Elite
 			// Remove the current record from the openList and add it to the closestList
 			openList.erase(std::remove(openList.begin(), openList.end(), curRecord));
 			closedList.push_back(curRecord);
-		}
-
-		// Loop over the open list for all non-checked records
-		for (const NodeRecord& openRecord : openList)
-		{
-			// Variable to hold wether the non-checked record is already in the closedList
-			bool isRecordInClosedList{};
-
-			// Check the closed list for an already existing connection to the current node
-			for (NodeRecord& existingRecord : closedList)
-			{
-				if (openRecord.pNode == existingRecord.pNode)
-				{
-					isRecordInClosedList = true;
-
-					// Check if the non-checked record is cheaper then the existing record
-					if (openRecord.costSoFar < existingRecord.costSoFar)
-					{
-						// If so, replace the connection in the existing record
-						existingRecord.pConnection = openRecord.pConnection;
-						existingRecord.costSoFar = openRecord.costSoFar;
-					}
-
-					break;
-				}
-			}
-
-			// If the non-checked record is not yet in the closedList, this is the cheapest route to the current node
-			// (Every route is cheaper then no route)
-			// So we add the record it to the closedList
-			if (!isRecordInClosedList)
-			{
-				closedList.push_back(openRecord);
-			}
 		}
 		
 		// If the result of the our search didn't end up at the goal node, find the node closest to the 

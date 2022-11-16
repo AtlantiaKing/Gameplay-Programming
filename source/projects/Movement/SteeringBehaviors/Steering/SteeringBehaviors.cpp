@@ -49,18 +49,16 @@ SteeringOutput Flee::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 SteeringOutput Arrive::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 {
 	SteeringOutput steering = {};
-	const float slowRadius{ 15.0f };
-	const float stopRadius{ 5.0f };
-	const float velocityRunOffFactor{ pAgent->GetMaxLinearSpeed() / Square(slowRadius - stopRadius)};
+	const float velocityRunOffFactor{ pAgent->GetMaxLinearSpeed() / Square(m_SlowRadius - m_TargetRadius)};
 
 	steering.LinearVelocity = m_Target.Position - pAgent->GetPosition();
 	const float distance{ steering.LinearVelocity.Normalize() };
 
-	if (distance > stopRadius)
+	if (distance > m_TargetRadius)
 	{
-		if (distance < slowRadius)
+		if (distance < m_SlowRadius)
 		{
-			steering.LinearVelocity *= Square(distance - stopRadius) * velocityRunOffFactor;
+			steering.LinearVelocity *= Square(distance - m_TargetRadius) * velocityRunOffFactor;
 		}
 		else
 		{
@@ -74,8 +72,8 @@ SteeringOutput Arrive::CalculateSteering(float deltaT, SteeringAgent* pAgent)
 
 	if (pAgent->CanRenderBehavior())
 	{
-		DEBUGRENDERER2D->DrawCircle(m_Target.Position, slowRadius, { 0.0f, 0.0f, 1.0f }, 0.0f);
-		DEBUGRENDERER2D->DrawCircle(m_Target.Position, stopRadius, { 1.0f, 0.0f, 0.0f }, 0.0f);
+		DEBUGRENDERER2D->DrawCircle(m_Target.Position, m_SlowRadius, { 0.0f, 0.0f, 1.0f }, 0.0f);
+		DEBUGRENDERER2D->DrawCircle(m_Target.Position, m_SlowRadius, { 1.0f, 0.0f, 0.0f }, 0.0f);
 		DEBUGRENDERER2D->DrawDirection(pAgent->GetPosition(), steering.LinearVelocity, 5.0f, {0.0f, 1.0f, 0.0f});
 	}
 

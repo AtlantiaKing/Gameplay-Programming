@@ -5,8 +5,10 @@
 //#define ActiveApp_Sandbox
 //#define ActiveApp_Steering
 //#define ActiveApp_CombinedSteering
+//#define ActiveApp_Flocking
 //#define ActiveApp_GraphTheory
 #define ActiveApp_AStar
+//#define ActiveApp_NavMesh
 
 //---------- Registered Applications -----------
 #ifdef ActiveApp_Sandbox
@@ -33,6 +35,10 @@ typedef App_GraphTheory CurrentApp;
 #ifdef ActiveApp_AStar
 #include "projects/Movement/PathFinding/AStar/App_PathfindingAStar/App_PathfindingAStar.h"
 typedef App_PathfindingAStar CurrentApp;
+#endif
+#ifdef ActiveApp_NavMesh
+#include "projects/Movement/PathFinding/NavMeshGraph/App_NavMeshGraph.h"
+typedef App_NavMeshGraph CurrentApp;
 #endif
 
 
