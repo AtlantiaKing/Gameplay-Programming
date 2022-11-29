@@ -9,7 +9,8 @@
 //#define ActiveApp_GraphTheory
 //#define ActiveApp_AStar
 //#define ActiveApp_NavMesh
-#define ActiveApp_FSM
+//#define ActiveApp_FSM
+#define ActiveApp_BT
 
 //---------- Registered Applications -----------
 #ifdef ActiveApp_Sandbox
@@ -45,6 +46,10 @@ typedef App_NavMeshGraph CurrentApp;
 #ifdef ActiveApp_FSM
 #include "projects/DecisionMaking//FiniteStateMachines/App_AgarioGame.h"
 typedef App_AgarioGame CurrentApp;
+#endif
+#ifdef ActiveApp_BT
+#include "projects/DecisionMaking//BehaviorTrees/App_AgarioGame_BT.h"
+typedef App_AgarioGame_BT CurrentApp;
 #endif
 
 
