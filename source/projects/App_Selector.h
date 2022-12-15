@@ -8,9 +8,11 @@
 //#define ActiveApp_Flocking
 //#define ActiveApp_GraphTheory
 //#define ActiveApp_AStar
-//#define ActiveApp_NavMesh
+#define ActiveApp_NavMesh
 //#define ActiveApp_FSM
-#define ActiveApp_BT
+//#define ActiveApp_BT
+//#define ActiveApp_IM
+//#define ActiveApp_Agario_IM
 
 //---------- Registered Applications -----------
 #ifdef ActiveApp_Sandbox
@@ -50,6 +52,14 @@ typedef App_AgarioGame CurrentApp;
 #ifdef ActiveApp_BT
 #include "projects/DecisionMaking//BehaviorTrees/App_AgarioGame_BT.h"
 typedef App_AgarioGame_BT CurrentApp;
+#endif
+#ifdef ActiveApp_IM
+#include "projects/DecisionMaking//InfluenceMaps/App_InfluenceMap.h"
+typedef App_InfluenceMap CurrentApp;
+#endif
+#ifdef ActiveApp_Agario_IM
+#include "projects/DecisionMaking//InfluenceMaps/App_AgarioGame_IM.h"
+typedef App_AgarioGame_IM CurrentApp;
 #endif
 
 

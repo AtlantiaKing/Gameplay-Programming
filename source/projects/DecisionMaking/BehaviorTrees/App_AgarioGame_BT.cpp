@@ -79,14 +79,6 @@ void App_AgarioGame_BT::Start()
 				new BehaviorSelector
 				{
 					{
-						// Try to flee from bigger enemies
-						new BehaviorSequence
-						{
-							{
-								new BehaviorConditional{ BT_Conditions::IsBiggerEnemyNearby },
-								new BehaviorAction{ BT_Actions::ChangeToFlee }
-							}
-						},
 						// Fall back to wander
 						new BehaviorAction{ BT_Actions::ChangeToWander }
 					}
