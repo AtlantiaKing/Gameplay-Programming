@@ -29,12 +29,19 @@ public:
 	void Render(float deltaTime) const override;
 
 private:
+	enum class GraphExercise
+	{
+		EulerPath,
+		ColorGraph,
+		MinimumSpanningTree
+	};
+
 	Elite::Graph2D<Elite::GraphNode2D, Elite::GraphConnection2D>* m_pGraph2D = nullptr;
 
 	Elite::GraphRenderer m_GraphRenderer{};
 	Elite::GraphEditor m_GraphEditor{};
 
-	bool m_UseGraphColoring{ true };
+	GraphExercise m_CurrentExercise{ GraphExercise::MinimumSpanningTree };
 	const static int m_MaxNrOfColors{ 15 };
 	const Elite::Color m_Colors[m_MaxNrOfColors]
 	{
